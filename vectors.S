@@ -1,3 +1,4 @@
+.h8300h
 .section .vectors
 .global _main
 
@@ -41,3 +42,10 @@
 .word 0 ; sci3
 .word 0 ; ad_conversion_end
 .word 0 ; reserved39
+
+.text
+.global _start
+_start:
+  mov.l  #0xff80, er7 ; initialize stack pointer
+  jsr _main ; jump to user program
+  rte
