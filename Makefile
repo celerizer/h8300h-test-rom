@@ -11,6 +11,7 @@ ifeq ($(CONFIG),payload)
 LDSCRIPT = link_payload.ld
 VECTOR_SRC = link_payload.S
 MAX_SIZE = 2048
+CFLAGS += -Os -fomit-frame-pointer -ffunction-sections -fdata-sections
 else
 LDSCRIPT = link_rom.ld
 VECTOR_SRC = link_rom.S
