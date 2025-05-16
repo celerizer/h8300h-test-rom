@@ -1,3 +1,4 @@
+OUTPUT_ARCH(h8300h)
 ENTRY(_main)
 
 SECTIONS

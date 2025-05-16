@@ -2,7 +2,9 @@ CC = h8300-hms-gcc
 AS = h8300-hms-as
 OBJCOPY = h8300-hms-objcopy
 
-CFLAGS = -mh -nostdlib
+CFLAGS = -mh -mn -nostdlib
+
+LDFLAGS = -m h8300h -T $(LDSCRIPT) -nostdlib
 
 # Allow switching with: make CONFIG=payload or make CONFIG=rom
 CONFIG ?= rom
@@ -17,8 +19,6 @@ LDSCRIPT = link_rom.ld
 VECTOR_SRC = link_rom.S
 MAX_SIZE = 49152
 endif
-
-LDFLAGS = -mh -T $(LDSCRIPT) -nostdlib
 
 all: main.elf main.bin
 
