@@ -29,7 +29,7 @@ main.o: main.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 link.o: $(VECTOR_SRC)
-	$(AS) -o $@ $<
+	$(CC) $(CFLAGS) -c $< -o $@
 
 main.bin: main.elf
 	$(OBJCOPY) -O binary $< $@

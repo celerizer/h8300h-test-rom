@@ -1,51 +1,76 @@
 .h8300h
-.section .vectors
+.global _crt0
 .global _main
+.global _null_handler
 
-.word _main ; Reset vector
-.word 0 ; reserved1
-.word 0 ; reserved2
-.word 0 ; reserved3
-.word 0 ; reserved4
-.word 0 ; reserved5
-.word 0 ; reserved6
-.word 0 ; nmi
-.word 0 ; trapa0
-.word 0 ; trapa1
-.word 0 ; trapa2
-.word 0 ; trapa3
-.word 0 ; reserved12
-.word 0 ; sleep
-.word 0 ; reserved14
-.word 0 ; reserved15
-.word 0 ; irq0
-.word 0 ; irq1
-.word 0 ; irqaec
-.word 0 ; reserved19
-.word 0 ; reserved20
-.word 0 ; comp0
-.word 0 ; comp1
-.word 0 ; rtc_quarter_second
-.word 0 ; rtc_half_second
-.word 0 ; rtc_second
-.word 0 ; rtc_minute
-.word 0 ; rtc_hour
-.word 0 ; rtc_day
-.word 0 ; rtc_week
-.word 0 ; rtc_free_running
-.word 0 ; watchdog_timer
-.word 0 ; async_event_counter
-.word 0 ; timer_b1
-.word 0 ; ssu_iic2
-.word 0 ; timer_w
-.word 0 ; reserved36
-.word 0 ; sci3
-.word 0 ; ad_conversion_end
-.word 0 ; reserved39
+.section .vectors
+.word _crt0 ; reset
+.word _null_handler ; reserved1
+.word _null_handler ; reserved2
+.word _null_handler ; reserved3
+.word _null_handler ; reserved4
+.word _null_handler ; reserved5
+.word _null_handler ; reserved6
+.word _null_handler ; nmi
+.word _null_handler ; trapa0
+.word _null_handler ; trapa1
+.word _null_handler ; trapa2
+.word _null_handler ; trapa3
+.word _null_handler ; reserved12
+.word _null_handler ; sleep
+.word _null_handler ; reserved14
+.word _null_handler ; reserved15
+.word _null_handler ; irq0
+.word _null_handler ; irq1
+.word _null_handler ; irqaec
+.word _null_handler ; reserved19
+.word _null_handler ; reserved20
+.word _null_handler ; comp0
+.word _null_handler ; comp1
+.word _null_handler ; rtc_quarter_second
+.word _null_handler ; rtc_half_second
+.word _null_handler ; rtc_second
+.word _null_handler ; rtc_minute
+.word _null_handler ; rtc_hour
+.word _null_handler ; rtc_day
+.word _null_handler ; rtc_week
+.word _null_handler ; rtc_free_running
+.word _null_handler ; watchdog_timer
+.word _null_handler ; async_event_counter
+.word _null_handler ; timer_b1
+.word _null_handler ; ssu_iic2
+.word _null_handler ; timer_w
+.word _null_handler ; reserved36
+.word _null_handler ; sci3
+.word _null_handler ; ad_conversion_end
+.word _null_handler ; reserved39
 
 .text
-.global _start
-_start:
-  mov.l  #0xff80, er7 ; initialize stack pointer
-  jsr _main ; jump to user program
-  rte
+_null_handler:
+  rts ; dummy handler: return from exception immediately
+
+_crt0:
+  mov.l #0xff80, er7 ; initialize stack pointer
+  
+  ; Transfer the data section from ROM to RAM
+  start_data:
+    mov.l #_data_src_start, er0
+    mov.l #_data_start, er1
+  start_data_loop:
+    mov.l @er0+, er3 ; load from rom
+    mov.l er3, @er1 ; store to ram
+    adds.l #4, er1 ; increment
+    cmp.l #_data_src_end, er0
+      blt start_data_loop
+
+  ; Zero-fill the BSS section
+  start_bss:
+    mov.l #_bss_end, er0
+    mov.l #0, er1
+  start_bss_loop:
+    mov.b r1l, @-er0
+    cmp.l #_bss_start, er0
+      bne start_bss_loop
+
+  ; Jump to user program
+  jmp _main
