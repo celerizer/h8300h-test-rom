@@ -1,5 +1,18 @@
-#define TEST_BASE_ADDR 0xF780
+#include "src/sys.h"
+
+#define TEST_BASE_ADDR 0xF7A0
 #define WRITE_TEST(n) (*(volatile unsigned char*)(TEST_BASE_ADDR + (n)) = (n))
+
+/* Verifies initialized and immutable values are kept in ROM */
+static const int rodata_test[] = { 417 };
+
+/* Verifies initialized but mutable static values are copied to RAM correctly */
+static unsigned char data_test[16] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+
+/* Verifies uninitialized static values are allocated in RAM correctly */
+unsigned char bss_test_1;
+unsigned char bss_test_2;
+static unsigned char bss_test_3;
 
 void test_addition(void)
 {
@@ -51,7 +64,10 @@ void test_comparison(void)
 
 void test_branch(void)
 {
-  if (5 > 3)
+  volatile int a = 5;
+  volatile int b = 3;
+  
+  if (a > b)
     WRITE_TEST(9);
 }
 
@@ -136,8 +152,40 @@ void test_large_addition(void)
     WRITE_TEST(20);
 }
 
+void test_rodata(void)
+{
+  if (rodata_test[0] == 417 &&
+    (unsigned int)rodata_test < 0xF000)
+  WRITE_TEST(21);
+}
+
+void test_data(void)
+{
+  unsigned total = 0;
+  unsigned i;
+  
+  for (i = 0; i < sizeof(data_test); i++)
+    data_test[i] *= 2;
+  for (i = 0; i < sizeof(data_test); i++)
+    total += data_test[i];
+  if (total == 240)
+    WRITE_TEST(22);
+}
+
+void test_bss(void)
+{
+  if (bss_test_1 == 0 &&
+      bss_test_2 == 0 &&
+      bss_test_3 == 0)
+    WRITE_TEST(23);
+}
+
+static const unsigned char colors[4] = { 0x00, 0x55, 0xAA, 0xFF };
+
 int main(void)
 {
+  int i = 0, j = 0, a = 0;
+
   test_addition();
   test_subtraction();
   test_multiplication();
@@ -158,8 +206,27 @@ int main(void)
   test_nonzero_compare();
   test_unsigned_wraparound();
   test_large_addition();
+  test_rodata();
+  test_data();
+  test_bss();
 
-  while(1);
+  st_init();
+
+  while (1)
+  {
+    unsigned char buffer[2] = { colors[a], colors[a] };
+
+    for (i = 0; i < 16; i++)
+    {
+      st_lcd_out_single(0xb0 + i);
+      for (j = 0; j < 128; j++)
+        st_lcd_out_data(buffer, sizeof(buffer));
+    }
+
+    a++;
+
+    a &= 3;
+  }
 
   return 0;
 }

@@ -47,7 +47,7 @@
 
 .text
 _null_handler:
-  rts ; dummy handler: return from exception immediately
+  rte ; dummy handler: return from exception immediately
 
 _crt0:
   mov.l #0xff80, er7 ; initialize stack pointer

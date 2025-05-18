@@ -9,6 +9,18 @@ LDFLAGS = -m h8300h -T $(LDSCRIPT) -nostdlib
 # Allow switching with: make CONFIG=payload or make CONFIG=rom
 CONFIG ?= rom
 
+SOURCES := \
+	main.c \
+	src/battery.c \
+	src/buttons.c \
+	src/eeprom.c \
+	src/lcd.c \
+	src/led.c \
+	src/ssu.c \
+	src/sys.c
+
+OBJECTS := $(SOURCES:.c=.o)
+
 ifeq ($(CONFIG),payload)
 LDSCRIPT = link_payload.ld
 VECTOR_SRC = link_payload.S
@@ -22,10 +34,10 @@ endif
 
 all: main.elf main.bin
 
-main.elf: link.o main.o
+main.elf: link.o $(OBJECTS)
 	$(CC) $(LDFLAGS) -o $@ $^
 
-main.o: main.c
+%.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 link.o: $(VECTOR_SRC)
