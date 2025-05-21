@@ -182,7 +182,7 @@ void test_bss(void)
 
 static const unsigned char colors[4] = { 0x00, 0x55, 0xAA, 0xFF };
 
-int main(void)
+__attribute__((noreturn)) int main(void)
 {
   int i = 0, j = 0, a = 0;
 
@@ -227,6 +227,4 @@ int main(void)
 
     a &= 3;
   }
-
-  return 0;
 }
