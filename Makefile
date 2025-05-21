@@ -6,8 +6,25 @@ CFLAGS = -mh -mn -nostdlib
 
 LDFLAGS = -m h8300h -T $(LDSCRIPT) -nostdlib
 
-# Allow switching with: make CONFIG=payload or make CONFIG=rom
+# The type of build to create: either a small payload to be injected into RAM
+# via IR, or a ROM image.
+# Valid options are: payload, rom
 CONFIG ?= rom
+
+# Set this to the name of the target system.
+# Valid options are: ntr027, ntr032
+SYSTEM ?= ntr032
+
+# Set this to the name of the target binary.
+TARGET ?= main
+
+ifeq ($(SYSTEM),ntr027)
+CFLAGS += -DST_SYSTEM=ST_SYSTEM_NTR027
+else ifeq ($(SYSTEM),ntr032)
+CFLAGS += -DST_SYSTEM=ST_SYSTEM_NTR032
+else
+$(error Unknown SYSTEM specified: $(SYSTEM))
+endif
 
 SOURCES := \
 	main.c \
@@ -24,17 +41,27 @@ OBJECTS := $(SOURCES:.c=.o)
 ifeq ($(CONFIG),payload)
 LDSCRIPT = link_payload.ld
 VECTOR_SRC = link_payload.S
+BIN_EXT = payload
+ifeq ($(SYSTEM),ntr027)
+MAX_SIZE = 1024
+else ifeq ($(SYSTEM),ntr032)
 MAX_SIZE = 2048
+endif
 CFLAGS += -Os -fomit-frame-pointer -ffunction-sections -fdata-sections
 else
 LDSCRIPT = link_rom.ld
 VECTOR_SRC = link_rom.S
+BIN_EXT = bin
+ifeq ($(SYSTEM),ntr027)
+MAX_SIZE = 16384
+else ifeq ($(SYSTEM),ntr032)
 MAX_SIZE = 49152
 endif
+endif
 
-all: main.elf main.bin
+all: $(TARGET).elf $(TARGET).$(BIN_EXT)
 
-main.elf: link.o $(OBJECTS)
+$(TARGET).elf: link.o $(OBJECTS)
 	$(CC) $(LDFLAGS) -o $@ $^
 
 %.o: %.c
@@ -43,7 +70,7 @@ main.elf: link.o $(OBJECTS)
 link.o: $(VECTOR_SRC)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-main.bin: main.elf
+$(TARGET).$(BIN_EXT): $(TARGET).elf
 	$(OBJCOPY) -O binary $< $@
 	@size=$$(stat -c %s $@); \
 	if [ "$$size" -gt $(MAX_SIZE) ]; then \
