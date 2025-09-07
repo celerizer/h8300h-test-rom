@@ -14,16 +14,16 @@ SECTIONS
   } > ROM
 
   .text 0x0050 : {
-    *(.text)
+    *(.text .text.*)
   } > ROM
 
   .rodata : {
-    *(.rodata)
+    *(.rodata .rodata.*)
   } > ROM
 
   .data : AT(ADDR(.rodata) + SIZEOF(.rodata)) {
     _data_start = .;
-    *(.data)
+    *(.data .data.*)
     _data_end = .;
   } > RAM
   _data_src_start = LOADADDR(.data);
@@ -32,7 +32,7 @@ SECTIONS
 
   .bss : {
     _bss_start = .;
-    *(.bss)
+    *(.bss .bss.*)
     _bss_end = .;
   } > RAM
   PROVIDE(_bss_size = _bss_end - _bss_start);

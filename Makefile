@@ -2,9 +2,9 @@ CC = h8300-hms-gcc
 AS = h8300-hms-as
 OBJCOPY = h8300-hms-objcopy
 
-CFLAGS = -mh -mn -nostdlib
+CFLAGS = -mh -mn -nostdlib -Os -fomit-frame-pointer -ffunction-sections -fdata-sections
 
-LDFLAGS = -m h8300h -T $(LDSCRIPT) -nostdlib
+LDFLAGS = -m h8300h -T $(LDSCRIPT) -nostdlib -Wl,--gc-sections
 
 # The type of build to create: either a small payload to be injected into RAM
 # via IR, or a ROM image.
@@ -47,7 +47,6 @@ MAX_SIZE = 1024
 else ifeq ($(SYSTEM),ntr032)
 MAX_SIZE = 2048
 endif
-CFLAGS += -Os -fomit-frame-pointer -ffunction-sections -fdata-sections
 else
 LDSCRIPT = link_rom.ld
 VECTOR_SRC = link_rom.S
@@ -71,10 +70,14 @@ link.o: $(VECTOR_SRC)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(TARGET).$(BIN_EXT): $(TARGET).elf
-	$(OBJCOPY) -O binary $< $@
+	$(OBJCOPY) -O binary --remove-section=.bss $< $@
 	@size=$$(stat -c %s $@); \
 	if [ "$$size" -gt $(MAX_SIZE) ]; then \
 		echo "ERROR: Output binary size ($$size bytes) exceeds limit ($(MAX_SIZE) bytes) for CONFIG=$(CONFIG)!"; \
+	else \
+		remain=$$(( $(MAX_SIZE) - $$size )); \
+		percent=$$(( 100 * $$size / $(MAX_SIZE) )); \
+		echo "OK: Binary size = $$size bytes (limit $(MAX_SIZE)), $$remain bytes free (~$$percent% used)."; \
 	fi
 
 clean:
