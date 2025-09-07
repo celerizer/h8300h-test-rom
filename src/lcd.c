@@ -40,45 +40,64 @@ void st_lcd_out_double(unsigned char command, unsigned char data)
   *(unsigned char*)(0xffd4) = 0x05;
 }
 
+static const unsigned char init_sequence[] =
+{
+  0xE2, /* Software reset */
+  0xB0, /* Y offset */
+  0xE1, /* Power save OFF */
+
+  0x48, 0x40, /* Multiplex ratio */
+
+  0xA0, /* Segment remap */
+  0xC0, /* Y-flip OFF */
+
+  0x44, 0x20, /* Display offset +32 */
+
+  0xAB, /* Internal oscillator ON */
+  0x67, /* DCDC factor */
+  0x25, /* IRR ratio */
+
+  0x81, 0x1A, /* Contrast */
+
+  0x52, /* LCD bias */
+  0x95, /* PWM */
+
+  0x88, 0x00, /* Palette color 1 */
+  0x89, 0x00, /* Palette color 2 */
+  0x8A, 0x55, /* Palette color 3 */
+  0x8B, 0x55, /* Palette color 4 */
+  0x8C, 0x77, /* Palette color 5 */
+  0x8D, 0x77, /* Palette color 6 */
+  0x8E, 0x99, /* Palette color 7 */
+  0x8F, 0x99, /* Palette color 8 */
+
+  0x4C, 0x04, /* Nline inversion */
+
+  0xF1, 0x00, /* Reserved */
+  0xF7, 0x02, /* Reserved */
+  0xF6, 0x0A, /* Reserved */
+
+  0x2F, /* Power control */
+  0x40, 0x00, /* Start line 0 */
+  0xA6, /* Invert display OFF */
+  0x81, 0x1F, /* Contrast */
+};
+
 void st_lcd_init(void)
 {
-  st_lcd_out_single(0xE2); /* Software reset */
-  st_lcd_out_single(0xB0); /* Y offset */
-  st_lcd_out_single(0xE1); /* Power save OFF */
+  unsigned i;
 
-  st_lcd_out_double(0x48, 0x40); /* Multiplex ratio */
+  for (i = 0; i < sizeof(init_sequence); i++)
+    st_lcd_out_single(init_sequence[i]);
+}
 
-  st_lcd_out_single(0xA0); /* Segment remap */
-  st_lcd_out_single(0xC0); /* Y-flip OFF */
+void st_lcd_set_x(unsigned char x)
+{
+  st_lcd_out_single(0x00 | (x & 0x0F));
+  st_lcd_out_single(0x10 | ((x >> 4) & 0x0F));
+}
 
-  st_lcd_out_double(0x44, 0x20); /* Display offset +32 */
-
-  st_lcd_out_single(0xAB); /* Internal oscillator ON */
-  st_lcd_out_single(0x67); /* DCDC factor */
-  st_lcd_out_single(0x25); /* IRR ratio */
-
-  st_lcd_out_double(0x81, 0x1A); /* Contrast */
-
-  st_lcd_out_single(0x52); /* LCD bias */
-  st_lcd_out_single(0x95); /* PWM */
-
-  st_lcd_out_double(0x88, 0x00); /* Palette color 1 */
-  st_lcd_out_double(0x89, 0x00); /* Palette color 2 */
-  st_lcd_out_double(0x8A, 0x55); /* Palette color 3 */
-  st_lcd_out_double(0x8B, 0x55); /* Palette color 4 */
-  st_lcd_out_double(0x8C, 0x77); /* Palette color 5 */
-  st_lcd_out_double(0x8D, 0x77); /* Palette color 6 */
-  st_lcd_out_double(0x8E, 0x99); /* Palette color 7 */
-  st_lcd_out_double(0x8F, 0x99); /* Palette color 8 */
-
-  st_lcd_out_double(0x4C, 0x04); /* Nline inversion */
-
-  st_lcd_out_double(0xF1, 0x00); /* Reserved */
-  st_lcd_out_double(0xF7, 0x02); /* Reserved */
-  st_lcd_out_double(0xF6, 0x0A); /* Reserved */
-
-  st_lcd_out_single(0x2F); /* Power control */
-  st_lcd_out_double(0x40, 0x00); /* Start line 0 */
-  st_lcd_out_single(0xA6); /* Invert display OFF */
-  st_lcd_out_double(0x81, 0x1F); /* Contrast */
+void st_lcd_set_y(unsigned char y)
+{
+  st_lcd_out_single(0xB0 | y);
 }

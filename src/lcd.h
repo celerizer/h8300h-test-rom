@@ -21,4 +21,16 @@ void st_lcd_out_single(unsigned char output);
  */
 void st_lcd_out_double(unsigned char command, unsigned char data);
 
+/**
+ * @brief Set the X (column) position of the LCD cursor.
+ * @param x The X position (0-127).
+ */
+void st_lcd_set_x(unsigned char x);
+
+/**
+ * @brief Set the Y (page) position of the LCD cursor.
+ * @param y The Y position (0-15).
+ */
+void st_lcd_set_y(unsigned char y);
+
 #endif
