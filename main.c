@@ -180,11 +180,21 @@ void test_bss(void)
     WRITE_TEST(23);
 }
 
-static const unsigned char colors[4] = { 0x00, 0x55, 0xAA, 0xFF };
+static const unsigned short colors[4] = { 0x0000, 0xFF00, 0x00FF, 0xFFFF };
+
+static unsigned char x_pos = 0;
+static unsigned char y_pos = 0;
+static unsigned char color_index = 1;
+static unsigned char button_left = 0;
+static unsigned char button_right = 0;
+static unsigned char button_center = 0;
+static unsigned char prev_left = 0;
+static unsigned char prev_right = 0;
+static unsigned char prev_center = 0;
 
 __attribute__((noreturn)) int main(void)
 {
-  int i = 0, j = 0, a = 0;
+  int i = 0, j = 0;
 
   test_addition();
   test_subtraction();
@@ -214,17 +224,32 @@ __attribute__((noreturn)) int main(void)
 
   while (1)
   {
-    unsigned char buffer[2] = { colors[a], colors[a] };
+    unsigned short buffer[2] = { colors[color_index], colors[color_index] };
 
-    for (i = 0; i < 16; i++)
+    button_left   = st_button_left();
+    button_right  = st_button_right();
+    button_center = st_button_center();
+
+    if (button_left && !prev_left)
     {
-      st_lcd_out_single(0xb0 + i);
-      for (j = 0; j < 128; j++)
-        st_lcd_out_data(buffer, sizeof(buffer));
+      if (x_pos > 0)
+      x_pos--;
+    }
+    if (button_right && !prev_right)
+      x_pos++;
+    if (button_center && !prev_center)
+    {
+      color_index++;
+      color_index %= 4;
     }
 
-    a++;
+    prev_left = button_left;
+    prev_right = button_right;
+    prev_center = button_center;
 
-    a &= 3;
+    st_lcd_set_y(y_pos);
+    st_lcd_set_x(x_pos);
+    for (j = 0; j < 1; j++)
+      st_lcd_out_data(buffer, sizeof(buffer));
   }
 }

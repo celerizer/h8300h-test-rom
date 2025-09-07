@@ -2,6 +2,7 @@
 #define STRIDE_SYSTEM_H
 
 #include "config.h"
+#include "graphics.h"
 #include "lcd.h"
 #include "ssu.h"
 #include "led.h"
@@ -23,6 +24,8 @@
 #define H8_ADSR H8_REG8(0xffbf)
 
 #define H8_PDR8 H8_REG8(0xffdb)
+#define H8_PDR9 H8_REG8(0xffdc)
+#define H8_PDRB H8_REG8(0xffde)
 
 void st_sys_init(void);
 
