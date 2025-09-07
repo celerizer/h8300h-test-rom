@@ -2,17 +2,26 @@
 
 #include "sys.h"
 
-unsigned char st_button_center(void)
+static unsigned char button_state;
+static unsigned char prev_button_state;
+
+static inline void st_button_poll(void)
 {
-  return (*H8_PDR8 & 0x01) ? 1 : 0;
+  prev_button_state = button_state;
+  button_state = *H8_PDRB;
 }
 
-unsigned char st_button_left(void)
+static inline unsigned char st_button_center_pressed(void)
 {
-  return (*H8_PDR8 & 0x04) ? 1 : 0;
+  return ((button_state & 0x01) && !(prev_button_state & 0x01));
 }
 
-unsigned char st_button_right(void)
+static inline unsigned char st_button_left_pressed(void)
 {
-  return (*H8_PDR8 & 0x10) ? 1 : 0;
+  return ((button_state & 0x04) && !(prev_button_state & 0x04));
+}
+
+static inline unsigned char st_button_right_pressed(void)
+{
+  return ((button_state & 0x10) && !(prev_button_state & 0x10));
 }
