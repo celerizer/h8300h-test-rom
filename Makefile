@@ -31,6 +31,7 @@ SOURCES := \
 	src/battery.c \
 	src/buttons.c \
 	src/eeprom.c \
+	src/graphics.c \
 	src/lcd.c \
 	src/led.c \
 	src/ssu.c \
