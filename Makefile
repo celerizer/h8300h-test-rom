@@ -2,7 +2,7 @@ CC = h8300-hms-gcc
 AS = h8300-hms-as
 OBJCOPY = h8300-hms-objcopy
 
-CFLAGS = -mh -mn -nostdlib -Os -fomit-frame-pointer -ffunction-sections -fdata-sections
+CFLAGS = -mh -nostdlib -Os -ffunction-sections -fdata-sections
 
 LDFLAGS = -m h8300h -T $(LDSCRIPT) -nostdlib -Wl,--gc-sections
 
@@ -17,6 +17,8 @@ SYSTEM ?= ntr032
 
 # Set this to the name of the target binary.
 TARGET ?= main
+
+MAPFILE = $(TARGET).map
 
 ifeq ($(SYSTEM),ntr027)
 CFLAGS += -DST_SYSTEM=ST_SYSTEM_NTR027
@@ -62,7 +64,7 @@ endif
 all: $(TARGET).elf $(TARGET).$(BIN_EXT)
 
 $(TARGET).elf: link.o $(OBJECTS)
-	$(CC) $(LDFLAGS) -o $@ $^
+	$(CC) $(LDFLAGS) -Wl,-Map=$(MAPFILE) -o $@ $^
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
@@ -83,3 +85,4 @@ $(TARGET).$(BIN_EXT): $(TARGET).elf
 
 clean:
 	rm -f *.o *.elf *.bin
+	rm -f src/*.o
