@@ -2,7 +2,9 @@ CC = h8300-hms-gcc
 AS = h8300-hms-as
 OBJCOPY = h8300-hms-objcopy
 
-CFLAGS = -mh -nostdlib -Os -ffunction-sections -fdata-sections
+STRIDE_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+
+CFLAGS = -mh -nostdlib -Os -ffunction-sections -fdata-sections -I$(STRIDE_DIR)/include
 
 LDFLAGS = -m h8300h -T $(LDSCRIPT) -nostdlib -Wl,--gc-sections
 
@@ -28,22 +30,21 @@ else
 $(error Unknown SYSTEM specified: $(SYSTEM))
 endif
 
-SOURCES := \
-	main.c \
-	src/battery.c \
-	src/buttons.c \
-	src/eeprom.c \
-	src/graphics.c \
-	src/lcd.c \
-	src/led.c \
-	src/ssu.c \
-	src/sys.c
+SOURCES += \
+	$(STRIDE_DIR)/src/battery.c \
+	$(STRIDE_DIR)/src/buttons.c \
+	$(STRIDE_DIR)/src/eeprom.c \
+	$(STRIDE_DIR)/src/graphics.c \
+	$(STRIDE_DIR)/src/lcd.c \
+	$(STRIDE_DIR)/src/led.c \
+	$(STRIDE_DIR)/src/ssu.c \
+	$(STRIDE_DIR)/src/sys.c
 
 OBJECTS := $(SOURCES:.c=.o)
 
 ifeq ($(CONFIG),payload)
-LDSCRIPT = link_payload.ld
-VECTOR_SRC = link_payload.S
+LDSCRIPT = $(STRIDE_DIR)/link_payload.ld
+VECTOR_SRC = $(STRIDE_DIR)/link_payload.S
 BIN_EXT = payload
 ifeq ($(SYSTEM),ntr027)
 MAX_SIZE = 1024
@@ -51,8 +52,8 @@ else ifeq ($(SYSTEM),ntr032)
 MAX_SIZE = 2048
 endif
 else
-LDSCRIPT = link_rom.ld
-VECTOR_SRC = link_rom.S
+LDSCRIPT = $(STRIDE_DIR)/link_rom.ld
+VECTOR_SRC = $(STRIDE_DIR)/link_rom.S
 BIN_EXT = bin
 ifeq ($(SYSTEM),ntr027)
 MAX_SIZE = 16384
@@ -84,5 +85,5 @@ $(TARGET).$(BIN_EXT): $(TARGET).elf
 	fi
 
 clean:
-	rm -f *.o *.elf *.bin
-	rm -f src/*.o
+	find . -type f -name '*.o' -exec rm -f {} +
+	rm -f *.o *.elf *.bin *.map *.payload

@@ -1,6 +1,6 @@
-#include "graphics.h"
+#include "../include/stride/graphics.h"
 
-#include "lcd.h"
+#include "../include/stride/lcd.h"
 
 void st_gfx_fill_rect(unsigned mode, unsigned char x, unsigned char y,
   unsigned char width, unsigned char height)

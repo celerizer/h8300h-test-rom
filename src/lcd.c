@@ -1,7 +1,7 @@
-#include "lcd.h"
+#include "../include/stride/lcd.h"
 
-#include "ssu.h"
-#include "sys.h"
+#include "../include/stride/ssu.h"
+#include "../include/stride/sys.h"
 
 unsigned char st_lcd_in_single(void)
 {

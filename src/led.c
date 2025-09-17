@@ -1,6 +1,6 @@
-#include "led.h"
+#include "../include/stride/led.h"
 
-#include "sys.h"
+#include "../include/stride/sys.h"
 
 void st_led_on(void)
 {

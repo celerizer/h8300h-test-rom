@@ -1,6 +1,6 @@
-#include "buttons.h"
+#include "../include/stride/buttons.h"
 
-#include "sys.h"
+#include "../include/stride/sys.h"
 
 static unsigned char button_state;
 static unsigned char prev_button_state;

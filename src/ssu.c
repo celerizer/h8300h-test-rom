@@ -1,6 +1,6 @@
-#include "ssu.h"
+#include "../include/stride/ssu.h"
 
-#include "sys.h"
+#include "../include/stride/sys.h"
 
 unsigned char st_ssu_in_singleton(void)
 {

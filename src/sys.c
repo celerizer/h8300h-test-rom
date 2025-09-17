@@ -1,11 +1,11 @@
-#include "sys.h"
+#include "../include/stride/sys.h"
 
-#include "config.h"
+#include "../include/stride/config.h"
 
 #if ST_SYSTEM == ST_SYSTEM_NTR032
-  #include "lcd.h"
+  #include "../include/stride/lcd.h"
 #elif ST_SYSTEM == ST_SYSTEM_NTR027
-  #include "led.h"
+  #include "../include/stride/led.h"
 #else
   #error "Unsupported system. Please define STRIDE_SYSTEM as NTR032 or NTR027."
 #endif

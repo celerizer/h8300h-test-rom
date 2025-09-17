@@ -1,6 +1,6 @@
-#include "battery.h"
+#include "../include/stride/battery.h"
 
-#include "sys.h"
+#include "../include/stride/sys.h"
 
 unsigned short st_battery_level(void)
 {
