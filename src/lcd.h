@@ -9,7 +9,7 @@ void st_lcd_init(void);
  * @param buffer Pointer to the data buffer to send.
  * @param length Length of the data buffer.
  */
-void st_lcd_out_data(const unsigned char *buffer, unsigned length);
+void st_lcd_out_data(const void *buffer, unsigned length);
 
 /**
  * @brief Send a single-byte command to the LCD.
@@ -32,5 +32,7 @@ void st_lcd_set_x(unsigned char x);
  * @param y The Y position (0-15).
  */
 void st_lcd_set_y(unsigned char y);
+
+unsigned char st_lcd_in_single(void);
 
 #endif

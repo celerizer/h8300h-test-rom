@@ -1,27 +1,43 @@
 #include "lcd.h"
 
 #include "ssu.h"
+#include "sys.h"
 
-void st_lcd_out_data(const unsigned char *buffer, unsigned length)
+unsigned char st_lcd_in_single(void)
+{
+  unsigned char value;
+
+  /* Select LCD in data mode */
+  *H8_PDR1 = 0x06;
+
+  value = st_ssu_in_singleton();
+
+  /* Deselect LCD */
+  *H8_PDR1 = 0x05;
+
+  return value;
+}
+
+void st_lcd_out_data(const void *buffer, unsigned length)
 {
   /* Select LCD in data mode */
-  *(unsigned char*)(0xffd4) = 0x06;
+  *H8_PDR1 = 0x06;
 
   st_ssu_out(buffer, length);
 
   /* Deselect LCD */
-  *(unsigned char*)(0xffd4) = 0x05;
+  *H8_PDR1 = 0x05;
 }
 
 void st_lcd_out_single(unsigned char output)
 {
   /* Select LCD */
-  *(unsigned char*)(0xffd4) = 0x04;
+  *H8_PDR1 = 0x04;
 
   st_ssu_out_singleton(output);
 
   /* Deselect LCD */
-  *(unsigned char*)(0xffd4) = 0x05;
+  *H8_PDR1 = 0x05;
 }
 
 void st_lcd_out_double(unsigned char command, unsigned char data)
@@ -32,12 +48,12 @@ void st_lcd_out_double(unsigned char command, unsigned char data)
   buffer[1] = data;
 
   /* Select LCD */
-  *(unsigned char*)(0xffd4) = 0x04;
+  *H8_PDR1 = 0x04;
 
   st_ssu_out(buffer, 2);
 
   /* Deselect LCD */
-  *(unsigned char*)(0xffd4) = 0x05;
+  *H8_PDR1 = 0x05;
 }
 
 static const unsigned char init_sequence[] =
