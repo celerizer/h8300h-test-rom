@@ -1,16 +1,29 @@
-# h8300h-test-rom
+# Stride
 
-An example ROM template for emulators targetting the NTR-032 hardware.
+**Stride** is an SDK for developing custom programs targeting **H8/300H pedometer hardware**.
 
-## Usage
+## Prerequisites
 
-- Add your C code to the project.
-- Define any required interrupt handlers:
-   * Write the function in C
-   * Add its symbol to the appropriate location in `vectors.S`
-- Ensure `main` does not return in your code, as it doing so causes undefined behavior. This is an intentional design choice to save some space on the stack. Either design your application to run indefinitely, or have it waitloop once it is finished.
+* Install the [GNU Development Tools for Renesas H8/300](https://h8300-hms.sourceforge.net/).
 
-## Building
+## Setup
 
-- Install the [GNU Development Tools for Renesas H8/300](https://h8300-hms.sourceforge.net/)
-- Run `make`
+1. Add Stride as a submodule in your project:
+
+   ```bash
+   git submodule add https://www.github.com/celerizer/stride
+   git submodule update --init --recursive
+   ```
+
+2. In your project’s Makefile:
+
+   * Add your program’s source files to the `SOURCES` variable.
+   * Include the Stride Makefile at the end:
+
+     ```make
+     include stride/Makefile
+     ```
+
+## Notes on `main`
+
+Your `main` function **must not return**, as returning can cause undefined behavior. This is intentional to save stack space. Design your application to either run indefinitely or enter a wait loop once it finishes.
