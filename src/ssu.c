@@ -2,7 +2,27 @@
 
 #include "sys.h"
 
-void st_ssu_out(const unsigned char *buffer, unsigned int length)
+unsigned char st_ssu_in_singleton(void)
+{
+  unsigned char dummy = 0;
+
+  /* Enable SSU receive */
+  *H8_SSCRH = 0x40;
+
+  /* Wait for receive data to be ready */
+  do dummy = *H8_SSCRL;
+  while (!(dummy & 0x01));
+
+  /* Read the received byte */
+  dummy = *H8_SSRDR;
+
+  /* Disable SSU receive */
+  *H8_SSCRH = 0x00;
+
+  return dummy;
+}
+
+void st_ssu_out(const void *buffer, unsigned int length)
 {
   unsigned char dummy = 0;
   unsigned short i;
@@ -13,7 +33,7 @@ void st_ssu_out(const unsigned char *buffer, unsigned int length)
   for (i = 0; i < length; i++)
   {
     /* Send the byte */
-    *H8_SSRR = buffer[i];
+    *H8_SSRR = ((unsigned char*)buffer)[i];
 
     /* Wait for transmit data to be empty */
     do dummy = *H8_SSCRL;
