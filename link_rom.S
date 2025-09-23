@@ -1,4 +1,7 @@
 .h8300h
+
+#include <stride/config.h>
+
 .global _crt0
 .global _main
 .global _null_handler
@@ -50,7 +53,7 @@ _null_handler:
   rte ; dummy handler: return from exception immediately
 
 _crt0:
-  mov.l #0xff80, er7 ; initialize stack pointer
+  mov.l #H8_STACK_TOP, er7 ; initialize stack pointer
   
   ; Transfer the data section from ROM to RAM
   start_data:
